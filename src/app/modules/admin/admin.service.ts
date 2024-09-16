@@ -1,7 +1,7 @@
 import { Prisma, PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
-const getAllADminsFromDB = async (params: any) => {
+const getAllAdminsFromDB = async (params: any) => {
   // All Individual conditions are to be in AND connection before query
   const andConditions: Prisma.AdminWhereInput[] = [];
 
@@ -54,5 +54,5 @@ const getAllADminsFromDB = async (params: any) => {
 };
 
 export const adminServices = {
-  getAllADminsFromDB,
+  getAllAdminsFromDB,
 };
