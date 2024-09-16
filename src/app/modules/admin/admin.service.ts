@@ -89,6 +89,13 @@ const getSingleAdminByIdFromDB = async (id: string) => {
 };
 
 const updateIntoDB = async (id: string, data: Partial<Admin>) => {
+  // Check if user with the given id exist or not
+  await prisma.admin.findUniqueOrThrow({
+    where: {
+      id,
+    },
+  });
+
   const result = await prisma.admin.update({
     where: {
       id,
@@ -98,8 +105,11 @@ const updateIntoDB = async (id: string, data: Partial<Admin>) => {
   return result;
 };
 
+const deleteAdminFromDB = async (id: string) => {};
+
 export const adminServices = {
   getAllAdminsFromDB,
   getSingleAdminByIdFromDB,
   updateIntoDB,
+  deleteAdminFromDB,
 };
