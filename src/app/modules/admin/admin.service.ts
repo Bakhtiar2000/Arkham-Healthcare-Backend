@@ -1,6 +1,7 @@
-import { Prisma, PrismaClient } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { adminSearchableFields } from "./admin.constant";
-const prisma = new PrismaClient();
+import calculatePagination from "../../utils/calculatePagination";
+import prisma from "../../shared/prisma";
 
 const getAllAdminsFromDB = async (params: any, options: any) => {
   // All Individual conditions are to be in AND connection before query
@@ -8,7 +9,7 @@ const getAllAdminsFromDB = async (params: any, options: any) => {
 
   // Dividing params into two parts - searchTerm for applying partial match, filteredData for applying exact match
   const { searchTerm, ...filteredData } = params;
-  const { limit, page } = options;
+  const { page, limit, skip } = calculatePagination(options);
   //   OR: [
   //     {
   //       name: {
@@ -49,8 +50,19 @@ const getAllAdminsFromDB = async (params: any, options: any) => {
     where: {
       AND: andConditions,
     },
-    skip: Number((page - 1) * limit),
-    take: Number(limit),
+    skip: skip,
+    take: limit,
+    orderBy: options.sortBy
+      ? options.sortOrder
+        ? {
+            [options.sortBy]: options.sortOrder,
+          }
+        : {
+            [options.sortBy]: "asc",
+          }
+      : {
+          createdAt: "desc",
+        },
   });
   return result;
 };

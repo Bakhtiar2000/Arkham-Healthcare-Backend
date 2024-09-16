@@ -7,7 +7,7 @@ const getAllAdmins = async (req: Request, res: Response) => {
   try {
     // Searches on only adminFIlterableFields and ignores other query fields
     const filters = pick(req.query, adminFIlterableFields);
-    const options = pick(req.query, ["page", "limit"]);
+    const options = pick(req.query, ["page", "limit", "sortBy", "sortOrder"]);
     const result = await adminServices.getAllAdminsFromDB(filters, options);
     res.status(200).json({
       success: true,
