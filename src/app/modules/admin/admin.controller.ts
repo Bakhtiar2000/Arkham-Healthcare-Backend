@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { adminServices } from "./admin.service";
 import pick from "../../shared/pick";
 import { adminFIlterableFields } from "./admin.constant";
+import sendResponse from "../../utils/sendResponse";
 
 const getAllAdmins = async (req: Request, res: Response) => {
   try {
@@ -9,7 +10,9 @@ const getAllAdmins = async (req: Request, res: Response) => {
     const filters = pick(req.query, adminFIlterableFields);
     const options = pick(req.query, ["page", "limit", "sortBy", "sortOrder"]);
     const result = await adminServices.getAllAdminsFromDB(filters, options);
-    res.status(200).json({
+
+    sendResponse(res, {
+      statusCode: 200,
       success: true,
       message: "Admins are fetched successfully",
       meta: result.meta,
@@ -27,7 +30,8 @@ const getAllAdmins = async (req: Request, res: Response) => {
 const getSingleAdminById = async (req: Request, res: Response) => {
   try {
     const result = await adminServices.getSingleAdminByIdFromDB(req.params.id);
-    res.status(200).json({
+    sendResponse(res, {
+      statusCode: 200,
       success: true,
       message: "Admin is fetched successfully",
       data: result,
@@ -44,9 +48,10 @@ const getSingleAdminById = async (req: Request, res: Response) => {
 const updateAdmin = async (req: Request, res: Response) => {
   try {
     const result = await adminServices.updateIntoDB(req.params.id, req.body);
-    res.status(200).json({
+    sendResponse(res, {
+      statusCode: 200,
       success: true,
-      message: "Admin data updated successfully",
+      message: "Admins data updated successfully",
       data: result,
     });
   } catch (err: any) {
@@ -61,7 +66,26 @@ const updateAdmin = async (req: Request, res: Response) => {
 const deleteAdmin = async (req: Request, res: Response) => {
   try {
     const result = await adminServices.deleteAdminFromDB(req.params.id);
-    res.status(200).json({
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: "Admin deleted successfully",
+      data: result,
+    });
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      message: err?.name || "Something went wrong!",
+      error: err,
+    });
+  }
+};
+
+const softDeleteAdmin = async (req: Request, res: Response) => {
+  try {
+    const result = await adminServices.softDeleteAdminFromDB(req.params.id);
+    sendResponse(res, {
+      statusCode: 200,
       success: true,
       message: "Admin deleted successfully",
       data: result,
@@ -80,4 +104,5 @@ export const adminControllers = {
   getSingleAdminById,
   updateAdmin,
   deleteAdmin,
+  softDeleteAdmin,
 };
