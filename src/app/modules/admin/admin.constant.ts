@@ -4,3 +4,5 @@ export const adminFIlterableFields = [
   "searchTerm",
   "contactNumber",
 ];
+
+export const adminSearchableFields = ["name", "email", "contactNumber"];
