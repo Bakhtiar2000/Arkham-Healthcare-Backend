@@ -11,7 +11,7 @@ const getAllAdmins = async (req: Request, res: Response) => {
     const result = await adminServices.getAllAdminsFromDB(filters, options);
     res.status(200).json({
       success: true,
-      message: "Admin data fetched successfully",
+      message: "Admins are fetched successfully",
       meta: result.meta,
       data: result.data,
     });
@@ -24,6 +24,24 @@ const getAllAdmins = async (req: Request, res: Response) => {
   }
 };
 
+const getSingleAdminById = async (req: Request, res: Response) => {
+  try {
+    const result = await adminServices.getSingleAdminByIdFromDB(req.params.id);
+    res.status(200).json({
+      success: true,
+      message: "Admin is fetched successfully",
+      data: result,
+    });
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      message: err?.name || "Something went wrong!",
+      error: err,
+    });
+  }
+};
+
 export const adminControllers = {
   getAllAdmins,
+  getSingleAdminById,
 };
