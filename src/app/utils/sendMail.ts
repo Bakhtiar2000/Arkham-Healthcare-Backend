@@ -19,11 +19,11 @@ const sendMail = async (email: string, html: string) => {
     from: `"Arkham Healthcare 🏥" <${config.emailSender.email}>`, // sender address
     to: email, // list of receivers
     subject: "Reset Password Link 🔗", // Subject line
-    text: "Click on the link to reset your password. Link expires in 5 minutes.", // plain text body
+    text: "Click on the link to reset your password. Link expires in 10 minutes.", // plain text body
     html, // html body
   });
 
-  console.log("Message sent: %s", info.messageId);
+  // console.log("Message sent: %s", info.messageId);
 };
 
 export default sendMail;

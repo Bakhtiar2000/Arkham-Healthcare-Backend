@@ -140,7 +140,7 @@ const forgotPassword = async (payload: { email: string }) => {
     userData.email,
     `<div>
         <p>Dear User,</p>
-        <p>Click on this Button to reset password </p> 
+        <p>Click on this Button to reset password. Link expires in 10 minutes.</p> 
         <p>
             <a href=${resetPassLink}>
                 <button>
