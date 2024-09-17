@@ -1,6 +1,7 @@
 import prisma from "../../shared/prisma";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+import generateToken from "../../utils/generateToken";
+
 const loginUser = async (payload: { email: string; password: string }) => {
   const userData = await prisma.user.findUniqueOrThrow({
     where: {
@@ -16,20 +17,17 @@ const loginUser = async (payload: { email: string; password: string }) => {
     throw new Error("Password is incorrect");
   }
 
-  const accessToken = jwt.sign(
-    {
-      email: userData.email,
-      role: userData.role,
-    },
-    "abcdefgh",
-    {
-      algorithm: "HS256",
-      expiresIn: "15m",
-    }
-  );
+  const tokenPayload = {
+    email: userData.email,
+    role: userData.role,
+  };
+
+  const accessToken = generateToken(tokenPayload, "abcdefgh", "5m");
+  const refreshToken = generateToken(tokenPayload, "abcdefghijklmnop", "30d");
 
   return {
     accessToken,
+    refreshToken,
     needsPasswordChange: userData.needPasswordChange,
   };
 };
