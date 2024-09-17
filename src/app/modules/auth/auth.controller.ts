@@ -24,6 +24,19 @@ const loginUser: RequestHandler = catchAsync(async (req, res) => {
   });
 });
 
+const refreshToken: RequestHandler = catchAsync(async (req, res) => {
+  const { refreshToken } = req.cookies;
+  const result = await authServices.refreshToken(refreshToken);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "New Access Token Has Been Generated",
+    data: result,
+  });
+});
+
 export const authControllers = {
   loginUser,
+  refreshToken,
 };

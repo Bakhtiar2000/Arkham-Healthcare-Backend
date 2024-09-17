@@ -4,9 +4,11 @@ import router from "./app/routes";
 import httpStatus from "http-status";
 import globalErrorHandler from "./app/middleWears/globalErrorHandler";
 import notFound from "./app/middleWears/notFound";
+import cookieParser from "cookie-parser";
 
 const app: Application = express();
 app.use(cors());
+app.use(cookieParser());
 
 // Parsers / MiddleWears
 app.use(express.json());
