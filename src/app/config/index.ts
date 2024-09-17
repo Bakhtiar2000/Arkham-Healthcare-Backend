@@ -15,17 +15,17 @@ export default {
     reset_pass_token_expires_in: process.env.RESET_PASS_TOKEN_EXPIRES_IN,
   },
   reset_pass_link: process.env.RESET_PASS_LINK,
-  // emailSender: {
-  //     email: process.env.EMAIL,
-  //     app_pass: process.env.APP_PASS
-  // },
-  // ssl: {
-  //     storeId: process.env.STORE_ID,
-  //     storePass: process.env.STORE_PASS,
-  //     successUrl: process.env.SUCCESS_URL,
-  //     cancelUrl: process.env.CANCEL_URL,
-  //     failUrl: process.env.FAIL_URL,
-  //     sslPaymentApi: process.env.SSL_PAYMENT_API,
-  //     sslValidationApi: process.env.SSL_VALIDATION_API
-  // }
+  emailSender: {
+    email: process.env.EMAIL,
+    app_pass: process.env.APP_PASS,
+  },
+  ssl: {
+    storeId: process.env.STORE_ID,
+    storePass: process.env.STORE_PASS,
+    successUrl: process.env.SUCCESS_URL,
+    cancelUrl: process.env.CANCEL_URL,
+    failUrl: process.env.FAIL_URL,
+    sslPaymentApi: process.env.SSL_PAYMENT_API,
+    sslValidationApi: process.env.SSL_VALIDATION_API,
+  },
 };
