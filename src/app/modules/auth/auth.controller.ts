@@ -5,7 +5,7 @@ import catchAsync from "../../utils/catchAsync";
 import { authServices } from "./auth.service";
 
 const loginUser: RequestHandler = catchAsync(async (req, res) => {
-  const result = await authServices.loginUser();
+  const result = await authServices.loginUser(req.body);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
