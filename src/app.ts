@@ -1,7 +1,6 @@
-import express, { Application, Request, Response, NextFunction } from "express";
+import express, { Application, Request, Response } from "express";
 import cors from "cors";
 import router from "./app/routes";
-import httpStatus from "http-status";
 import globalErrorHandler from "./app/middleWears/globalErrorHandler";
 import notFound from "./app/middleWears/notFound";
 import cookieParser from "cookie-parser";
