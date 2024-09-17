@@ -6,7 +6,11 @@ import ApiError from "../errors/apiError";
 import httpStatus from "http-status";
 
 const auth = (...roles: string[]) => {
-  return async (req: Request, res: Response, next: NextFunction) => {
+  return async (
+    req: Request & { user?: any }, // req has access to both Request and user type now.
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
       const token = req.headers.authorization;
       if (!token) {
@@ -17,6 +21,7 @@ const auth = (...roles: string[]) => {
         config.jwt.access_token_secret as Secret
       );
 
+      req.user = verifiedUser;
       if (roles.length && !roles.includes(verifiedUser.role)) {
         throw new ApiError(httpStatus.FORBIDDEN, "You are not Forbidden!");
       }

@@ -1,4 +1,4 @@
-import { RequestHandler } from "express";
+import { Request, RequestHandler } from "express";
 import sendResponse from "../../utils/sendResponse";
 import httpStatus from "http-status";
 import catchAsync from "../../utils/catchAsync";
@@ -36,7 +36,34 @@ const refreshToken: RequestHandler = catchAsync(async (req, res) => {
   });
 });
 
+const changePassword: RequestHandler = catchAsync(
+  async (req: Request & { user?: any }, res) => {
+    // As we use req.user, we assign type for this controller
+    const result = await authServices.changePassword(req.user, req.body);
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Password has been changed",
+      data: result,
+    });
+  }
+);
+
+const forgotPassword: RequestHandler = catchAsync(async (req, res) => {
+  const result = await authServices.forgotPassword(req.body);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Email has been sent",
+    data: result,
+  });
+});
+
 export const authControllers = {
   loginUser,
   refreshToken,
+  changePassword,
+  forgotPassword,
 };
