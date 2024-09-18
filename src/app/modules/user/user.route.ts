@@ -24,10 +24,10 @@ router.post(
   auth(UserRole.ADMIN, UserRole.SUPER_ADMIN),
   fileUploader.upload.single("file"),
   (req: Request, res: Response, next: NextFunction) => {
-    req.body = userValidations.createAdminValidationSchema.parse(
+    req.body = userValidations.createDoctorValidationSchema.parse(
       JSON.parse(req.body.data)
     );
-    return userControllers.createAdmin(req, res);
+    return userControllers.createDoctor(req, res);
   }
 );
 
