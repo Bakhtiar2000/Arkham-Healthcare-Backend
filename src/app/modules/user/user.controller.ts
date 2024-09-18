@@ -18,6 +18,7 @@ const createAdmin = async (req: Request, res: Response) => {
     });
   }
 };
+
 const createDoctor = async (req: Request, res: Response) => {
   try {
     const result = await userServices.createDoctorIntoDB(req);
@@ -35,7 +36,25 @@ const createDoctor = async (req: Request, res: Response) => {
   }
 };
 
+const createPatient = async (req: Request, res: Response) => {
+  try {
+    const result = await userServices.createPatientIntoDB(req);
+    res.status(200).json({
+      success: true,
+      message: "Patient created successfully",
+      data: result,
+    });
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      message: err?.name || "Something went wrong",
+      error: err,
+    });
+  }
+};
+
 export const userControllers = {
   createAdmin,
   createDoctor,
+  createPatient,
 };
