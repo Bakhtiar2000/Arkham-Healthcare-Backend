@@ -1,8 +1,8 @@
 import prisma from "../../shared/prisma";
 import bcrypt from "bcrypt";
-import generateToken from "../../utils/generateToken";
+import { generateToken } from "./auth.utils";
 import { Secret } from "jsonwebtoken";
-import verifyToken from "../../utils/verifyToken";
+import { verifyToken } from "./auth.utils";
 import { UserStatus } from "@prisma/client";
 import config from "../../config";
 import sendMail from "../../utils/sendMail";
