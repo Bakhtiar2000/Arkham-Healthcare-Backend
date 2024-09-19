@@ -7,6 +7,8 @@ import { userValidations } from "./user.validation";
 
 const router = express.Router();
 
+router.get("/", userControllers.getAllUsers);
+
 router.post(
   "/create-admin",
   auth(UserRole.ADMIN, UserRole.SUPER_ADMIN),
@@ -15,7 +17,7 @@ router.post(
     req.body = userValidations.createAdminValidationSchema.parse(
       JSON.parse(req.body.data)
     );
-    return userControllers.createAdmin(req, res);
+    return userControllers.createAdmin(req, res, next);
   }
 );
 
@@ -27,7 +29,7 @@ router.post(
     req.body = userValidations.createDoctorValidationSchema.parse(
       JSON.parse(req.body.data)
     );
-    return userControllers.createDoctor(req, res);
+    return userControllers.createDoctor(req, res, next);
   }
 );
 
@@ -38,7 +40,7 @@ router.post(
     req.body = userValidations.createPatientValidationSchema.parse(
       JSON.parse(req.body.data)
     );
-    return userControllers.createPatient(req, res);
+    return userControllers.createPatient(req, res, next);
   }
 );
 

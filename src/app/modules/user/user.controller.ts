@@ -1,60 +1,64 @@
-import { Request, Response } from "express";
+import { Request, RequestHandler, Response } from "express";
 import { userServices } from "./user.service";
 import { IFile } from "../../interfaces/file";
+import catchAsync from "../../utils/catchAsync";
+import pick from "../../shared/pick";
+import sendResponse from "../../utils/sendResponse";
+import httpStatus from "http-status";
+import { userFilterableFields } from "./user.constant";
 
-const createAdmin = async (req: Request, res: Response) => {
-  try {
+const createAdmin: RequestHandler = catchAsync(
+  async (req: Request, res: Response) => {
     const result = await userServices.createAdminIntoDB(req);
-    res.status(200).json({
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
       success: true,
       message: "Admin created successfully",
       data: result,
     });
-  } catch (err: any) {
-    res.status(500).json({
-      success: false,
-      message: err?.name || "Something went wrong",
-      error: err,
-    });
   }
-};
+);
 
-const createDoctor = async (req: Request, res: Response) => {
-  try {
+const createDoctor: RequestHandler = catchAsync(
+  async (req: Request, res: Response) => {
     const result = await userServices.createDoctorIntoDB(req);
-    res.status(200).json({
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
       success: true,
       message: "Doctor created successfully",
       data: result,
     });
-  } catch (err: any) {
-    res.status(500).json({
-      success: false,
-      message: err?.name || "Something went wrong",
-      error: err,
-    });
   }
-};
+);
 
-const createPatient = async (req: Request, res: Response) => {
-  try {
+const createPatient: RequestHandler = catchAsync(
+  async (req: Request, res: Response) => {
     const result = await userServices.createPatientIntoDB(req);
-    res.status(200).json({
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
       success: true,
       message: "Patient created successfully",
       data: result,
     });
-  } catch (err: any) {
-    res.status(500).json({
-      success: false,
-      message: err?.name || "Something went wrong",
-      error: err,
-    });
   }
-};
+);
+
+const getAllUsers: RequestHandler = catchAsync(async (req, res) => {
+  const filters = pick(req.query, userFilterableFields);
+  const options = pick(req.query, ["page", "limit", "sortBy", "sortOrder"]);
+  const result = await userServices.getAllUsersFromDB(filters, options);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Users are fetched successfully",
+    meta: result.meta,
+    data: result.data,
+  });
+});
 
 export const userControllers = {
   createAdmin,
   createDoctor,
   createPatient,
+  getAllUsers,
 };
