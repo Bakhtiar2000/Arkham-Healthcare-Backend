@@ -131,6 +131,19 @@ const getAllUsersFromDB = async (params: any, options: TPaginationOptions) => {
       : {
           createdAt: "desc",
         },
+    // Excluding password from response
+    select: {
+      id: true,
+      email: true,
+      role: true,
+      needPasswordChange: true,
+      status: true,
+      createdAt: true,
+      updatedAt: true,
+      // admin: true,
+      // patient: true,
+      // doctor: true,
+    },
   });
   const total = await prisma.user.count({
     where: {
@@ -147,9 +160,27 @@ const getAllUsersFromDB = async (params: any, options: TPaginationOptions) => {
   };
 };
 
+const changeProfileStatusIntoDB = async (id: string, status: UserRole) => {
+  await prisma.user.findUniqueOrThrow({
+    where: {
+      id,
+    },
+  });
+
+  const updatedUserStatus = await prisma.user.update({
+    where: {
+      id,
+    },
+    data: status,
+  });
+
+  return updatedUserStatus;
+};
+
 export const userServices = {
   createAdminIntoDB,
   createDoctorIntoDB,
   createPatientIntoDB,
   getAllUsersFromDB,
+  changeProfileStatusIntoDB,
 };

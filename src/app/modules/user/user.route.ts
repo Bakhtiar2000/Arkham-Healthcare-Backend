@@ -4,10 +4,15 @@ import { UserRole } from "@prisma/client";
 import auth from "../../middleWears/auth";
 import { fileUploader } from "../../utils/fileUploader";
 import { userValidations } from "./user.validation";
+import validateRequest from "../../utils/validateRequest";
 
 const router = express.Router();
 
-router.get("/", userControllers.getAllUsers);
+router.get(
+  "/",
+  auth(UserRole.ADMIN, UserRole.SUPER_ADMIN),
+  userControllers.getAllUsers
+);
 
 router.post(
   "/create-admin",
@@ -42,6 +47,13 @@ router.post(
     );
     return userControllers.createPatient(req, res, next);
   }
+);
+
+router.patch(
+  "/:id/status",
+  auth(UserRole.ADMIN, UserRole.SUPER_ADMIN),
+  validateRequest(userValidations.updateStatusValidationSchema),
+  userControllers.changeProfileStatus
 );
 
 export const userRoutes = router;
