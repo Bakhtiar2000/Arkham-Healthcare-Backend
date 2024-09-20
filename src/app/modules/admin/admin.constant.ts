@@ -1,4 +1,4 @@
-export const adminFIlterableFields = [
+export const adminFilterableFields = [
   "name",
   "email",
   "searchTerm",

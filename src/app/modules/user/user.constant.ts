@@ -1,5 +1,3 @@
-export const userSearchableFields: string[] = ["email"]; // Only for searchTerm  (partial match)
-
 //  For other query fields than searchTerm  (exact match)
 export const userFilterableFields: string[] = [
   "email",
@@ -7,3 +5,6 @@ export const userFilterableFields: string[] = [
   "role",
   "status",
 ];
+
+// Only for searchTerm  (partial match)
+export const userSearchableFields: string[] = ["email"];

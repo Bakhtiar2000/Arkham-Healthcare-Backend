@@ -1,14 +1,14 @@
 import { RequestHandler } from "express";
 import { adminServices } from "./admin.service";
 import pick from "../../shared/pick";
-import { adminFIlterableFields } from "./admin.constant";
+import { adminFilterableFields } from "./admin.constant";
 import sendResponse from "../../utils/sendResponse";
 import httpStatus from "http-status";
 import catchAsync from "../../utils/catchAsync";
 
 const getAllAdmins: RequestHandler = catchAsync(async (req, res) => {
-  // Searches on only adminFIlterableFields and ignores other query fields
-  const filters = pick(req.query, adminFIlterableFields);
+  // Searches on only adminFilterableFields and ignores other query fields
+  const filters = pick(req.query, adminFilterableFields);
   const options = pick(req.query, ["page", "limit", "sortBy", "sortOrder"]);
   const result = await adminServices.getAllAdminsFromDB(filters, options);
   sendResponse(res, {
