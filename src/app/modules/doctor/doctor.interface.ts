@@ -14,7 +14,7 @@ export type TDoctorUpdate = {
   registrationNumber: string;
   experience: number;
   gender: "MALE" | "FEMALE";
-  apointmentFee: number;
+  appointmentFee: number;
   qualification: string;
   currentWorkingPlace: string;
   designation: string;

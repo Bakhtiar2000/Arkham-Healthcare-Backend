@@ -130,7 +130,7 @@ const updateDoctorIntoDB = async (id: string, payload: TDoctorUpdate) => {
   });
 
   await prisma.$transaction(async (transactionClient) => {
-    //--------------- Task-1: Update data ----------------------
+    //--------------- Transaction-1: Update data ----------------------
     if (doctorData) {
       await transactionClient.doctor.update({
         where: {
@@ -147,7 +147,7 @@ const updateDoctorIntoDB = async (id: string, payload: TDoctorUpdate) => {
         (specialty) => specialty.isDeleted
       );
       for (const specialty of deleteSpecialtiesIds) {
-        //------------------ Task-2: Delete doctorSpecialties (isDeleted: true) -------------------
+        //------------------ Transaction-2: Delete doctorSpecialties (isDeleted: true) -------------------
         await transactionClient.doctorSpecialties.deleteMany({
           // Inside for loop, 'delete' gives error. So, we used 'deleteMany'. However, one data gets deleted in each loop even after using deleteMany.
           where: {
@@ -163,7 +163,7 @@ const updateDoctorIntoDB = async (id: string, payload: TDoctorUpdate) => {
       );
 
       for (const specialty of createSpecialtiesIds) {
-        //------------------ Task-3: Create doctorSpecialties (isDeleted: false)  -------------------
+        //------------------ Transaction-3: Create doctorSpecialties (isDeleted: false)  -------------------
         await transactionClient.doctorSpecialties.create({
           data: {
             doctorId: doctorInfo.id,
