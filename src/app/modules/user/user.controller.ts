@@ -1,12 +1,12 @@
 import { Request, RequestHandler, Response } from "express";
 import { userServices } from "./user.service";
-import { IFile } from "../../interfaces/file.type";
+import { TFile } from "../../interfaces/file.type";
 import catchAsync from "../../utils/catchAsync";
 import pick from "../../shared/pick";
 import sendResponse from "../../utils/sendResponse";
 import httpStatus from "http-status";
 import { userFilterableFields } from "./user.constant";
-import { IAuthUser } from "../../interfaces/authUser.type";
+import { TAuthUser } from "../../interfaces/authUser.type";
 
 const createAdmin: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
@@ -70,8 +70,8 @@ const changeProfileStatus: RequestHandler = catchAsync(
   }
 );
 const getMyProfile: RequestHandler = catchAsync(
-  async (req: Request & { user?: IAuthUser }, res) => {
-    const result = await userServices.getMyProfileFromDB(req.user as IAuthUser);
+  async (req: Request & { user?: TAuthUser }, res) => {
+    const result = await userServices.getMyProfileFromDB(req.user as TAuthUser);
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
@@ -82,9 +82,9 @@ const getMyProfile: RequestHandler = catchAsync(
 );
 
 const updateMyProfile = catchAsync(
-  async (req: Request & { user?: IAuthUser }, res: Response) => {
+  async (req: Request & { user?: TAuthUser }, res: Response) => {
     const result = await userServices.updateMyProfileIntoDB(
-      req.user as IAuthUser,
+      req.user as TAuthUser,
       req
     );
 

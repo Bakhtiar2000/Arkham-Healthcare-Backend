@@ -2,7 +2,7 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 import { v2 as cloudinary } from "cloudinary";
-import { ICloudinaryResponse, IFile } from "../interfaces/file.type";
+import { TCloudinaryResponse, TFile } from "../interfaces/file.type";
 
 cloudinary.config({
   cloud_name: "dbgrq28js",
@@ -20,12 +20,12 @@ const storage = multer.diskStorage({
 });
 
 const uploadToCloudinary = async (
-  file: IFile
-): Promise<ICloudinaryResponse | undefined> => {
+  file: TFile
+): Promise<TCloudinaryResponse | undefined> => {
   return new Promise((resolve, reject) => {
     cloudinary.uploader.upload(
       file.path,
-      (error: Error, result: ICloudinaryResponse) => {
+      (error: Error, result: TCloudinaryResponse) => {
         fs.unlinkSync(file.path);
         if (error) {
           reject(error);

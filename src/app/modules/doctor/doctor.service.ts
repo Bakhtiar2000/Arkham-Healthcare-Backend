@@ -1,12 +1,12 @@
 import { Doctor, Prisma, UserStatus } from "@prisma/client";
-import { IDoctorFilterRequest, IDoctorUpdate } from "./doctor.interface";
+import { TDoctorFilterRequest, TDoctorUpdate } from "./doctor.interface";
 import { doctorSearchableFields } from "./doctor.constants";
 import calculatePagination from "../../utils/calculatePagination";
 import prisma from "../../shared/prisma";
 import { TPaginationOptions } from "../../interfaces/pagination.type";
 
 const getAllDoctorsFromDB = async (
-  filters: IDoctorFilterRequest,
+  filters: TDoctorFilterRequest,
   options: TPaginationOptions
 ) => {
   const { limit, page, skip } = calculatePagination(options);
@@ -120,7 +120,7 @@ const getDoctorByIdFromDB = async (id: string): Promise<Doctor | null> => {
   return result;
 };
 
-const updateDoctorIntoDB = async (id: string, payload: IDoctorUpdate) => {
+const updateDoctorIntoDB = async (id: string, payload: TDoctorUpdate) => {
   const { specialties, ...doctorData } = payload;
 
   const doctorInfo = await prisma.doctor.findUniqueOrThrow({
