@@ -2,7 +2,7 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 import { v2 as cloudinary } from "cloudinary";
-import { ICloudinaryResponse, IFile } from "../interfaces/file";
+import { ICloudinaryResponse, IFile } from "../interfaces/file.type";
 
 cloudinary.config({
   cloud_name: "dbgrq28js",

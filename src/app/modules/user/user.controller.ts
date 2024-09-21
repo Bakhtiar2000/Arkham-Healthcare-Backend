@@ -1,11 +1,12 @@
 import { Request, RequestHandler, Response } from "express";
 import { userServices } from "./user.service";
-import { IFile } from "../../interfaces/file";
+import { IFile } from "../../interfaces/file.type";
 import catchAsync from "../../utils/catchAsync";
 import pick from "../../shared/pick";
 import sendResponse from "../../utils/sendResponse";
 import httpStatus from "http-status";
 import { userFilterableFields } from "./user.constant";
+import { IAuthUser } from "../../interfaces/authUser.type";
 
 const createAdmin: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
@@ -68,15 +69,33 @@ const changeProfileStatus: RequestHandler = catchAsync(
     });
   }
 );
-const getMyProfile: RequestHandler = catchAsync(async (req, res) => {
-  const result = await userServices.getMyProfileFromDB(req.user);
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: "Profile data retrieved!",
-    data: result,
-  });
-});
+const getMyProfile: RequestHandler = catchAsync(
+  async (req: Request & { user?: IAuthUser }, res) => {
+    const result = await userServices.getMyProfileFromDB(req.user as IAuthUser);
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Profile data retrieved successfully!",
+      data: result,
+    });
+  }
+);
+
+const updateMyProfile = catchAsync(
+  async (req: Request & { user?: IAuthUser }, res: Response) => {
+    const result = await userServices.updateMyProfileIntoDB(
+      req.user as IAuthUser,
+      req
+    );
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "My profile updated successfully!",
+      data: result,
+    });
+  }
+);
 
 export const userControllers = {
   createAdmin,
@@ -85,4 +104,5 @@ export const userControllers = {
   getAllUsers,
   changeProfileStatus,
   getMyProfile,
+  updateMyProfile,
 };

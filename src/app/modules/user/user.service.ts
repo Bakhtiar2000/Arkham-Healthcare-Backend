@@ -9,11 +9,12 @@ import {
 import bcrypt from "bcrypt";
 import prisma from "../../shared/prisma";
 import { fileUploader } from "../../utils/fileUploader";
-import { IFile } from "../../interfaces/file";
+import { IFile } from "../../interfaces/file.type";
 import { Request } from "express";
-import { TPaginationOptions } from "../../interfaces/pagination";
+import { TPaginationOptions } from "../../interfaces/pagination.type";
 import { userSearchableFields } from "./user.constant";
 import calculatePagination from "../../utils/calculatePagination";
+import { IAuthUser } from "../../interfaces/authUser.type";
 
 const createAdminIntoDB = async (req: Request): Promise<Admin> => {
   const file = req.file as IFile;
@@ -184,10 +185,10 @@ const changeProfileStatusIntoDB = async (id: string, status: UserRole) => {
   return updatedUserStatus;
 };
 
-const getMyProfileFromDB = async (user) => {
+const getMyProfileFromDB = async (user: IAuthUser) => {
   const userInfo = await prisma.user.findUniqueOrThrow({
     where: {
-      email: user.email,
+      email: user?.email,
       status: UserStatus.ACTIVE,
     },
     select: {
@@ -229,6 +230,8 @@ const getMyProfileFromDB = async (user) => {
   return { ...userInfo, ...profileInfo }; // If there is similar data in both table (Like createdAt, updatedAt), response will show only one of them. If there is different data on same property name (Like id), response will pick from profile data
 };
 
+const updateMyProfileIntoDB = async (user: IAuthUser, req: Request) => {};
+
 export const userServices = {
   createAdminIntoDB,
   createDoctorIntoDB,
@@ -236,4 +239,5 @@ export const userServices = {
   getAllUsersFromDB,
   changeProfileStatusIntoDB,
   getMyProfileFromDB,
+  updateMyProfileIntoDB,
 };

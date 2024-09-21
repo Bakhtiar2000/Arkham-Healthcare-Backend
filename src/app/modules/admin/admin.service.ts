@@ -3,7 +3,7 @@ import { adminSearchableFields } from "./admin.constant";
 import calculatePagination from "../../utils/calculatePagination";
 import prisma from "../../shared/prisma";
 import { TAdminFilterRequest } from "./admin.interface";
-import { TPaginationOptions } from "../../interfaces/pagination";
+import { TPaginationOptions } from "../../interfaces/pagination.type";
 
 const getAllAdminsFromDB = async (
   params: TAdminFilterRequest,
