@@ -5,7 +5,7 @@ import catchAsync from "../../utils/catchAsync";
 import { paymentServices } from "./payment.service";
 
 const initPayment: RequestHandler = catchAsync(async (req, res) => {
-  const result = await paymentServices.initPayment();
+  const result = await paymentServices.initPayment(req.params.appointmentId);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
