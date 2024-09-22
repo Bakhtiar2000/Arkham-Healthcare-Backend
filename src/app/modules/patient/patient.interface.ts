@@ -30,7 +30,7 @@ type TMedicalReport = {
   reportLink: string;
 };
 
-export type IPatientUpdate = {
+export type TPatientUpdate = {
   name: string;
   contactNumber: string;
   address: string;

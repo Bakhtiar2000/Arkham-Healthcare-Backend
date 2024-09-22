@@ -1,5 +1,5 @@
 import { Patient, Prisma, UserStatus } from "@prisma/client";
-import { IPatientUpdate, TPatientFilterRequest } from "./patient.interface";
+import { TPatientUpdate, TPatientFilterRequest } from "./patient.interface";
 import { patientSearchableFields } from "./patient.constants";
 import { TPaginationOptions } from "../../interfaces/pagination.type";
 import prisma from "../../shared/prisma";
@@ -88,7 +88,7 @@ const getPatientByIdFromDB = async (id: string): Promise<Patient | null> => {
 
 const updatePatientIntoDB = async (
   id: string,
-  payload: Partial<IPatientUpdate>
+  payload: Partial<TPatientUpdate>
 ): Promise<Patient | null> => {
   const { patientHealthData, medicalReport, ...patientData } = payload;
 
@@ -127,6 +127,7 @@ const updatePatientIntoDB = async (
     }
 
     //  Transaction-3: Cerate medical report
+    // Should have used createMany here and the data should have been received as an array as one patient can have many medical reports. Fix it if feels necessary
     if (medicalReport) {
       await transactionClient.medicalReport.create({
         data: {
@@ -150,28 +151,31 @@ const updatePatientIntoDB = async (
 };
 
 const deletePatientFromDB = async (id: string): Promise<Patient | null> => {
-  const result = await prisma.$transaction(async (tx) => {
-    // delete medical report
-    await tx.medicalReport.deleteMany({
+  const result = await prisma.$transaction(async (t) => {
+    //----------------- Transaction-1: delete medical report ------------------
+    //In Patient model,  medicalReport MedicalReport[]...... So, one patient can have multiple medical reports. Hence we use 'deleteMany'
+    await t.medicalReport.deleteMany({
       where: {
         patientId: id,
       },
     });
 
-    // delete patient health data
-    await tx.patientHealthData.delete({
+    //----------------- Transaction-2: Delete patient health data -----------------
+    await t.patientHealthData.delete({
       where: {
         patientId: id,
       },
     });
 
-    const deletedPatient = await tx.patient.delete({
+    //----------------- Transaction-3: Delete patient data -----------------
+    const deletedPatient = await t.patient.delete({
       where: {
         id,
       },
     });
 
-    await tx.user.delete({
+    //----------------- Transaction-4: Delete user data ----------------
+    await t.user.delete({
       where: {
         email: deletedPatient.email,
       },
@@ -184,15 +188,15 @@ const deletePatientFromDB = async (id: string): Promise<Patient | null> => {
 };
 
 const softDeletePatientFromDB = async (id: string): Promise<Patient | null> => {
-  return await prisma.$transaction(async (transactionClient) => {
-    const deletedPatient = await transactionClient.patient.update({
+  return await prisma.$transaction(async (tClient) => {
+    const deletedPatient = await tClient.patient.update({
       where: { id },
       data: {
         isDeleted: true,
       },
     });
 
-    await transactionClient.user.update({
+    await tClient.user.update({
       where: {
         email: deletedPatient.email,
       },
