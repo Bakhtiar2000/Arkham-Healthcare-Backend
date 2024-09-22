@@ -5,6 +5,7 @@ import catchAsync from "../../utils/catchAsync";
 import { appointmentServices } from "./appointment.service";
 import { TAuthUser } from "../../interfaces/authUser.type";
 import pick from "../../shared/pick";
+import { appointmentFilterableFields } from "./appointment.constants";
 
 const createAppointment: RequestHandler = catchAsync(
   async (req: Request & { user?: TAuthUser }, res) => {
@@ -40,7 +41,24 @@ const getMyAppointments: RequestHandler = catchAsync(
   }
 );
 
+const getAllAppointments = catchAsync(async (req, res) => {
+  const filters = pick(req.query, appointmentFilterableFields);
+  const options = pick(req.query, ["limit", "page", "sortBy", "sortOrder"]);
+  const result = await appointmentServices.getAllAppointmentsFromDB(
+    filters,
+    options
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Appointments retrieved successfully",
+    meta: result.meta,
+    data: result.data,
+  });
+});
+
 export const appointmentControllers = {
   createAppointment,
   getMyAppointments,
+  getAllAppointments,
 };
