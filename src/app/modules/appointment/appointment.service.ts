@@ -1,6 +1,9 @@
+import { Prisma, UserRole } from "@prisma/client";
 import { TAuthUser } from "../../interfaces/authUser.type";
+import { TPaginationOptions } from "../../interfaces/pagination.type";
 import prisma from "../../shared/prisma";
 import { v4 as uuidV4 } from "uuid";
+import calculatePagination from "../../utils/calculatePagination";
 
 const createAppointmentIntoDB = async (user: TAuthUser, payload: any) => {
   const { doctorId, scheduleId } = payload;
@@ -67,7 +70,11 @@ const createAppointmentIntoDB = async (user: TAuthUser, payload: any) => {
       "-" +
       today.getHours() +
       "-" +
-      today.getMinutes();
+      today.getMinutes() +
+      "-" +
+      today.getSeconds() +
+      "-" +
+      today.getMilliseconds();
     await tx.payment.create({
       data: {
         appointmentId: appointmentData.id,
@@ -82,6 +89,76 @@ const createAppointmentIntoDB = async (user: TAuthUser, payload: any) => {
   return result;
 };
 
+const getMyAppointMents = async (
+  user: TAuthUser,
+  filters: any,
+  options: TPaginationOptions
+) => {
+  const { limit, page, skip } = calculatePagination(options);
+  const { ...filterData } = filters;
+
+  const andConditions: Prisma.AppointmentWhereInput[] = [];
+
+  if (user?.role === UserRole.PATIENT) {
+    andConditions.push({
+      patient: {
+        email: user?.email,
+      },
+    });
+  } else if (user?.role === UserRole.DOCTOR) {
+    andConditions.push({
+      doctor: {
+        email: user?.email,
+      },
+    });
+  }
+
+  if (Object.keys(filterData).length > 0) {
+    const filterConditions = Object.keys(filterData).map((key) => ({
+      [key]: {
+        equals: (filterData as any)[key],
+      },
+    }));
+    andConditions.push(...filterConditions);
+  }
+
+  const whereConditions: Prisma.AppointmentWhereInput =
+    andConditions.length > 0 ? { AND: andConditions } : {};
+
+  const result = await prisma.appointment.findMany({
+    where: whereConditions,
+    skip,
+    take: limit,
+    orderBy:
+      options.sortBy && options.sortOrder
+        ? { [options.sortBy]: options.sortOrder }
+        : { createdAt: "desc" },
+    include:
+      // Patients see doctor's details and doctors can see patient's details
+      user?.role === UserRole.PATIENT
+        ? { doctor: true, schedule: true }
+        : {
+            patient: {
+              include: { medicalReport: true, patientHealthData: true },
+            },
+            schedule: true,
+          },
+  });
+
+  const total = await prisma.appointment.count({
+    where: whereConditions,
+  });
+
+  return {
+    meta: {
+      total,
+      page,
+      limit,
+    },
+    data: result,
+  };
+};
 export const appointmentServices = {
   createAppointmentIntoDB,
+  getMyAppointMents,
 };

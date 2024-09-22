@@ -4,6 +4,7 @@ import httpStatus from "http-status";
 import catchAsync from "../../utils/catchAsync";
 import { appointmentServices } from "./appointment.service";
 import { TAuthUser } from "../../interfaces/authUser.type";
+import pick from "../../shared/pick";
 
 const createAppointment: RequestHandler = catchAsync(
   async (req: Request & { user?: TAuthUser }, res) => {
@@ -20,6 +21,26 @@ const createAppointment: RequestHandler = catchAsync(
   }
 );
 
+const getMyAppointments: RequestHandler = catchAsync(
+  async (req: Request & { user?: TAuthUser }, res) => {
+    const filters = pick(req.query, ["status", "paymentStatus"]);
+    const options = pick(req.query, ["page", "limit", "sortBy", "sortOrder"]);
+    const result = await appointmentServices.getMyAppointMents(
+      req.user as TAuthUser,
+      filters,
+      options
+    );
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "My Appointments are fetched successfully",
+      meta: result.meta,
+      data: result.data,
+    });
+  }
+);
+
 export const appointmentControllers = {
   createAppointment,
+  getMyAppointments,
 };
