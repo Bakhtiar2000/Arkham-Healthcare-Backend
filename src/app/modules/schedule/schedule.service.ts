@@ -42,21 +42,19 @@ const createScheduleIntoDB = async (
         endDateTime: addMinutes(startDateTime, intervalTime),
       };
 
-      //   const existingSchedule = await prisma.schedule.findFirst({
-      //     where: {
-      //       startDateTime: scheduleData.startDateTime,
-      //       endDateTime: scheduleData.endDateTime,
-      //     },
-      //   });
+      const existingSchedule = await prisma.schedule.findFirst({
+        where: {
+          startDateTime: scheduleData.startDateTime,
+          endDateTime: scheduleData.endDateTime,
+        },
+      });
 
-      //   if (!existingSchedule) {
-      //     const result = await prisma.schedule.create({
-      //       data: scheduleData,
-      //     });
-      //     schedules.push(result);
-      //   }
-
-      console.log(scheduleData);
+      if (!existingSchedule) {
+        const result = await prisma.schedule.create({
+          data: scheduleData,
+        });
+        schedules.push(result);
+      }
 
       // INCREMENTING minutes of a day by 30  minutes
       startDateTime.setMinutes(startDateTime.getMinutes() + intervalTime); // setMinutes, getMinutes are properties of Date
@@ -66,7 +64,7 @@ const createScheduleIntoDB = async (
     formattedStartDate.setDate(formattedStartDate.getDate() + 1);
   }
 
-  //   return schedules;
+  return schedules;
 };
 
 export const scheduleServices = {
