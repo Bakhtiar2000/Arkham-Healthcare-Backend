@@ -53,6 +53,29 @@ const createAppointmentIntoDB = async (user: TAuthUser, payload: any) => {
         appointmentId: appointmentData.id,
       },
     });
+
+    //------------------- Transaction-3: Cerate Payment -------------------
+    const today = new Date();
+    // timeStamp as transactionId
+    const transactionId =
+      "Arkham-HealthCare-" +
+      today.getFullYear() +
+      "-" +
+      today.getMonth() +
+      "-" +
+      today.getDay() +
+      "-" +
+      today.getHours() +
+      "-" +
+      today.getMinutes();
+    await tx.payment.create({
+      data: {
+        appointmentId: appointmentData.id,
+        amount: doctorData.appointmentFee,
+        transactionId,
+      },
+    });
+
     return appointmentData;
   });
 
