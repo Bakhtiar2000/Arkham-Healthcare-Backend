@@ -3,6 +3,7 @@ import sendResponse from "../../utils/sendResponse";
 import httpStatus from "http-status";
 import catchAsync from "../../utils/catchAsync";
 import { authServices } from "./auth.service";
+import { TAuthUser } from "../../interfaces/authUser.type";
 
 const loginUser: RequestHandler = catchAsync(async (req, res) => {
   const result = await authServices.loginUser(req.body);
@@ -37,9 +38,12 @@ const refreshToken: RequestHandler = catchAsync(async (req, res) => {
 });
 
 const changePassword: RequestHandler = catchAsync(
-  async (req: Request & { user?: any }, res) => {
+  async (req: Request & { user?: TAuthUser }, res) => {
     // As we use req.user, we assign type for this controller
-    const result = await authServices.changePassword(req.user, req.body);
+    const result = await authServices.changePassword(
+      req.user as TAuthUser,
+      req.body
+    );
 
     sendResponse(res, {
       statusCode: httpStatus.OK,

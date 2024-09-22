@@ -3,11 +3,12 @@ import sendResponse from "../../utils/sendResponse";
 import httpStatus from "http-status";
 import catchAsync from "../../utils/catchAsync";
 import { doctorScheduleServices } from "./doctorSchedule.service";
+import { TAuthUser } from "../../interfaces/authUser.type";
 
 const createDoctorSchedule: RequestHandler = catchAsync(
-  async (req: Request & { user?: any }, res) => {
+  async (req: Request & { user?: TAuthUser }, res) => {
     const result = await doctorScheduleServices.createDoctorScheduleIntoDB(
-      req.user,
+      req.user as TAuthUser,
       req.body
     );
     sendResponse(res, {

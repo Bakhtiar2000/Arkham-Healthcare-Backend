@@ -8,6 +8,7 @@ import config from "../../config";
 import sendMail from "../../utils/sendMail";
 import ApiError from "../../errors/apiError";
 import httpStatus from "http-status";
+import { TAuthUser } from "../../interfaces/authUser.type";
 
 const loginUser = async (payload: { email: string; password: string }) => {
   const userData = await prisma.user.findUniqueOrThrow({
@@ -78,7 +79,7 @@ const refreshToken = async (token: string) => {
   };
 };
 
-const changePassword = async (user: any, payload: any) => {
+const changePassword = async (user: TAuthUser, payload: any) => {
   const userData = await prisma.user.findUniqueOrThrow({
     where: {
       email: user?.email,

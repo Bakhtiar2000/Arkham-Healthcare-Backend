@@ -1,12 +1,13 @@
+import { TAuthUser } from "../../interfaces/authUser.type";
 import prisma from "../../shared/prisma";
 
 const createDoctorScheduleIntoDB = async (
-  user: any,
+  user: TAuthUser,
   payload: { scheduleIds: string[] }
 ) => {
   const doctorData = await prisma.doctor.findUniqueOrThrow({
     where: {
-      email: user.email,
+      email: user?.email,
     },
   });
 
