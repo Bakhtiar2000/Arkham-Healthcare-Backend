@@ -64,7 +64,6 @@ const getMyPrescriptionsFromDB = async (
         : { createdAt: "desc" },
     include: {
       doctor: true,
-      appointment: true,
     },
   });
 
