@@ -1,6 +1,6 @@
 import express from "express";
 import { appointmentControllers } from "./appointment.controller";
-import auth from "../../middleWears/auth";
+import auth from "../../middlewares/auth";
 import { UserRole } from "@prisma/client";
 import validateRequest from "../../utils/validateRequest";
 import { appointmentValidations } from "./appointment.validation";

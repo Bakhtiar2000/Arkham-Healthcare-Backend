@@ -1,7 +1,7 @@
 import express from "express";
 import { doctorControllers } from "./doctor.controller";
 import { UserRole } from "@prisma/client";
-import auth from "../../middleWears/auth";
+import auth from "../../middlewares/auth";
 import validateRequest from "../../utils/validateRequest";
 import { doctorValidations } from "./doctor.validation";
 
