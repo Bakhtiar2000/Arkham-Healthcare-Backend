@@ -37,6 +37,7 @@ const createReviewIntoDB = async (user: TAuthUser, payload: any) => {
       },
     });
 
+    // In prisma, aggregate functions have underscore (_avg, _sum, _count etc.) before its name
     const averageRating = await tx.review.aggregate({
       _avg: {
         rating: true,
