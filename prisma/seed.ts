@@ -1,6 +1,6 @@
 import { UserRole } from "@prisma/client";
 import prisma from "../src/app/shared/prisma";
-
+import bcrypt from "bcrypt";
 const seedSuperAdmin = async () => {
   try {
     const isSuperAdminExists = await prisma.user.findFirst({
@@ -9,14 +9,15 @@ const seedSuperAdmin = async () => {
       },
     });
     if (isSuperAdminExists) {
-      console.log("Super Admin Already exists");
+      console.log("Super Admin  Already exists");
       return;
     }
 
+    const hashedPassword: string = await bcrypt.hash("superAdmin12345", 12);
     const superAdminData = await prisma.user.create({
       data: {
         email: "superAdmin@arkham.com",
-        password: "superAdmin12345",
+        password: hashedPassword,
         role: UserRole.SUPER_ADMIN,
         admin: {
           create: {
