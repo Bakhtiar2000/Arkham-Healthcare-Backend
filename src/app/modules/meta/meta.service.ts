@@ -1,4 +1,4 @@
-import { UserRole } from "@prisma/client";
+import { PaymentStatus, UserRole } from "@prisma/client";
 import { TAuthUser } from "../../interfaces/authUser.type";
 import prisma from "../../shared/prisma";
 
@@ -32,9 +32,16 @@ const getSuperAdminMetaData = async () => {
   const doctorCount = await prisma.doctor.count();
   const adminCount = await prisma.admin.count();
   const paymentCount = await prisma.payment.count();
-  const totalRevenueCount = await prisma.payment.aggregate({
-    _sum: { amount: true },
-  });
+  const totalRevenueCount = (
+    await prisma.payment.aggregate({
+      _sum: { amount: true },
+      where: {
+        status: PaymentStatus.PAID,
+      },
+    })
+  )._sum.amount;
+  // Original data: totalRevenueCount: { _sum : { amount : 500 } } }
+  // Formatted data: totalRevenueCount : 500
 
   return {
     appointmentCount,
@@ -52,9 +59,16 @@ const getAdminMetaData = async () => {
   const patientCount = await prisma.patient.count();
   const doctorCount = await prisma.doctor.count();
   const paymentCount = await prisma.payment.count();
-  const totalRevenueCount = await prisma.payment.aggregate({
-    _sum: { amount: true },
-  });
+  const totalRevenueCount = (
+    await prisma.payment.aggregate({
+      _sum: { amount: true },
+      where: {
+        status: PaymentStatus.PAID,
+      },
+    })
+  )._sum.amount;
+  // Original data: totalRevenueCount: { _sum : { amount : 500 } } }
+  // Formatted data: totalRevenueCount : 500
 
   return {
     appointmentCount,
@@ -67,7 +81,7 @@ const getAdminMetaData = async () => {
 
 // ____________DOCTOR____________
 const getDoctorMetaData = async (user: TAuthUser) => {
-  const doctorData = await prisma.patient.findUniqueOrThrow({
+  const doctorData = await prisma.doctor.findUniqueOrThrow({
     where: {
       email: user?.email,
     },
@@ -78,12 +92,14 @@ const getDoctorMetaData = async (user: TAuthUser) => {
       doctorId: doctorData.id,
     },
   });
-  const patientCount = await prisma.appointment.groupBy({
-    by: ["patientId"],
-    _count: {
-      id: true,
-    },
-  });
+  const patientCount = (
+    await prisma.appointment.groupBy({
+      by: ["patientId"],
+      _count: {
+        id: true,
+      },
+    })
+  ).length;
 
   const reviewCount = await prisma.review.count({
     where: {
@@ -91,16 +107,19 @@ const getDoctorMetaData = async (user: TAuthUser) => {
     },
   });
 
-  const totalRevenueCount = await prisma.payment.aggregate({
-    where: {
-      appointment: {
-        doctorId: doctorData.id,
+  const totalRevenueCount = (
+    await prisma.payment.aggregate({
+      where: {
+        appointment: {
+          doctorId: doctorData.id,
+          paymentStatus: PaymentStatus.PAID,
+        },
       },
-    },
-    _sum: {
-      amount: true,
-    },
-  });
+      _sum: {
+        amount: true,
+      },
+    })
+  )._sum.amount;
 
   const statusBasedAppointmentCount = (
     await prisma.appointment.groupBy({
@@ -154,16 +173,19 @@ const getPatientMetaData = async (user: TAuthUser) => {
     },
   });
 
-  const totalDoctorFeeSpentCount = await prisma.payment.aggregate({
-    where: {
-      appointment: {
-        patientId: patientData.id,
+  const totalDoctorFeeSpentCount = (
+    await prisma.payment.aggregate({
+      where: {
+        appointment: {
+          patientId: patientData.id,
+          paymentStatus: PaymentStatus.PAID,
+        },
       },
-    },
-    _sum: {
-      amount: true,
-    },
-  });
+      _sum: {
+        amount: true,
+      },
+    })
+  )._sum.amount;
 
   const statusBasedAppointmentCount = (
     await prisma.appointment.groupBy({
