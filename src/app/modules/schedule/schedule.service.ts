@@ -6,6 +6,12 @@ import { TPaginationOptions } from "../../interfaces/pagination.type";
 import calculatePagination from "../../utils/calculatePagination";
 import { TAuthUser } from "../../interfaces/authUser.type";
 
+// UTC time converter
+const convertDateTime = (date: Date) => {
+  const offset = date.getTimezoneOffset() * 60 * 1000;
+  return new Date(date.getTime() + offset);
+};
+
 const createScheduleIntoDB = async (
   payload: TSchedule
 ): Promise<Schedule[]> => {
@@ -40,9 +46,14 @@ const createScheduleIntoDB = async (
     );
 
     while (startDateTime < endDateTime) {
+      // const scheduleData = {
+      //   startDateTime: startDateTime,
+      //   endDateTime: addMinutes(startDateTime, intervalTime),
+      // };
+
       const scheduleData = {
-        startDateTime: startDateTime,
-        endDateTime: addMinutes(startDateTime, intervalTime),
+        startDateTime: convertDateTime(startDateTime),
+        endDateTime: convertDateTime(addMinutes(startDateTime, intervalTime)),
       };
 
       const existingSchedule = await prisma.schedule.findFirst({
