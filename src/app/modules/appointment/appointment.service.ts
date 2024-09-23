@@ -1,9 +1,16 @@
-import { Prisma, UserRole } from "@prisma/client";
+import {
+  AppointmentStatus,
+  PaymentStatus,
+  Prisma,
+  UserRole,
+} from "@prisma/client";
 import { TAuthUser } from "../../interfaces/authUser.type";
 import { TPaginationOptions } from "../../interfaces/pagination.type";
 import prisma from "../../shared/prisma";
 import { v4 as uuidV4 } from "uuid";
 import calculatePagination from "../../utils/calculatePagination";
+import ApiError from "../../errors/apiError";
+import httpStatus from "http-status";
 
 const createAppointmentIntoDB = async (user: TAuthUser, payload: any) => {
   const { doctorId, scheduleId } = payload;
@@ -226,8 +233,97 @@ const getAllAppointmentsFromDB = async (
   };
 };
 
+const changeAppointmentStatusIntoDB = async (
+  user: TAuthUser,
+  id: string,
+  status: AppointmentStatus
+) => {
+  const appointmentData = await prisma.appointment.findUniqueOrThrow({
+    where: {
+      id,
+    },
+    include: {
+      doctor: true,
+    },
+  });
+
+  if (
+    user?.role === UserRole.DOCTOR &&
+    user?.email !== appointmentData.doctor.email
+  ) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      "Unauthorized access. Wrong appointment!"
+    );
+  }
+
+  const result = prisma.appointment.update({
+    where: {
+      id,
+    },
+    data: {
+      status,
+    },
+  });
+
+  return result;
+};
+
+const cancelUnpaidAppointmentsFromDB = async () => {
+  // We calculate 30 minutes before present time and find if any appointment was created before that time
+  const duration = new Date(Date.now() - 30 * 60 * 1000); // 30 minutes ago
+
+  const unpaidAppointments = await prisma.appointment.findMany({
+    where: {
+      createdAt: {
+        lte: duration,
+      },
+      paymentStatus: PaymentStatus.UNPAID,
+    },
+  });
+
+  const appointmentIdsToCancel = unpaidAppointments.map(
+    (appointment) => appointment.id
+  );
+
+  await prisma.$transaction(async (tx) => {
+    //--------------- Transaction-1: Delete all unpaid appointment data from payment database ---------------
+    await tx.payment.deleteMany({
+      where: {
+        appointmentId: {
+          in: appointmentIdsToCancel,
+        },
+      },
+    });
+
+    //--------------- Transaction-2: Delete all unpaid appointments from appointment database ---------------
+    await tx.appointment.deleteMany({
+      where: {
+        id: {
+          in: appointmentIdsToCancel,
+        },
+      },
+    });
+
+    //--------------- Transaction-3: Update isBooked: false in doctorSchedules database ---------------
+    for (const upPaidAppointment of unpaidAppointments) {
+      await tx.doctorSchedules.updateMany({
+        where: {
+          doctorId: upPaidAppointment.doctorId,
+          scheduleId: upPaidAppointment.scheduleId,
+        },
+        data: {
+          isBooked: false,
+        },
+      });
+    }
+  });
+};
+
 export const appointmentServices = {
   createAppointmentIntoDB,
   getMyAppointMents,
   getAllAppointmentsFromDB,
+  changeAppointmentStatusIntoDB,
+  cancelUnpaidAppointmentsFromDB,
 };
