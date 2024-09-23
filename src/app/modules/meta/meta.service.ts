@@ -6,26 +6,44 @@ const fetchDashboardMetaDataFromDB = async (user: TAuthUser) => {
   let metaData;
   switch (user?.role) {
     case UserRole.SUPER_ADMIN:
-      getSuperAdminMetaData();
+      metaData = getSuperAdminMetaData();
       break;
     case UserRole.ADMIN:
-      getAdminMetaData();
+      metaData = getAdminMetaData();
       break;
     case UserRole.DOCTOR:
-      getDoctorMetaData(user as TAuthUser);
+      metaData = getDoctorMetaData(user as TAuthUser);
       break;
     case UserRole.PATIENT:
-      getPatientMetaData();
+      metaData = getPatientMetaData(user as TAuthUser);
       break;
 
     default:
       throw new Error("Invalid User Role");
   }
+
+  return metaData;
 };
 
 // ____________SUPER_ADMIN____________
 const getSuperAdminMetaData = async () => {
-  console.log("Super Admin");
+  const appointmentCount = await prisma.appointment.count();
+  const patientCount = await prisma.patient.count();
+  const doctorCount = await prisma.doctor.count();
+  const adminCount = await prisma.admin.count();
+  const paymentCount = await prisma.payment.count();
+  const totalRevenueCount = await prisma.payment.aggregate({
+    _sum: { amount: true },
+  });
+
+  return {
+    appointmentCount,
+    patientCount,
+    doctorCount,
+    adminCount,
+    paymentCount,
+    totalRevenueCount,
+  };
 };
 
 // ____________ADMIN____________
@@ -112,8 +130,63 @@ const getDoctorMetaData = async (user: TAuthUser) => {
 };
 
 // ____________PATIENT____________
-const getPatientMetaData = async () => {
-  console.log("Patient");
+const getPatientMetaData = async (user: TAuthUser) => {
+  const patientData = await prisma.patient.findUniqueOrThrow({
+    where: {
+      email: user?.email,
+    },
+  });
+
+  const appointmentCount = await prisma.appointment.count({
+    where: {
+      patientId: patientData.id,
+    },
+  });
+  const prescriptionCount = await prisma.prescription.count({
+    where: {
+      patientId: patientData.id,
+    },
+  });
+
+  const reviewCount = await prisma.review.count({
+    where: {
+      patientId: patientData.id,
+    },
+  });
+
+  const totalDoctorFeeSpentCount = await prisma.payment.aggregate({
+    where: {
+      appointment: {
+        patientId: patientData.id,
+      },
+    },
+    _sum: {
+      amount: true,
+    },
+  });
+
+  const statusBasedAppointmentCount = (
+    await prisma.appointment.groupBy({
+      by: ["status"],
+      _count: {
+        id: true,
+      },
+      where: {
+        patientId: patientData.id,
+      },
+    })
+  ).map(({ status, _count }) => ({
+    status: status,
+    count: Number(_count.id),
+  }));
+
+  return {
+    appointmentCount,
+    prescriptionCount,
+    reviewCount,
+    totalDoctorFeeSpentCount,
+    statusBasedAppointmentCount,
+  };
 };
 
 export const metaServices = {
