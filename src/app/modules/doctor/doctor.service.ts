@@ -10,7 +10,6 @@ const getAllDoctorsFromDB = async (
   options: TPaginationOptions
 ) => {
   const { limit, page, skip } = calculatePagination(options);
-  console.log(filters);
   const { searchTerm, specialties, ...filterData } = filters;
 
   const andConditions: Prisma.DoctorWhereInput[] = [];
