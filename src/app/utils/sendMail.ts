@@ -22,8 +22,6 @@ const sendMail = async (email: string, html: string) => {
     text: "Click on the link to reset your password. Link expires in 10 minutes.", // plain text body
     html, // html body
   });
-
-  // console.log("Message sent: %s", info.messageId);
 };
 
 export default sendMail;
