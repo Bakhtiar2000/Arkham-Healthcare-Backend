@@ -34,7 +34,6 @@ const getMyScheduleFromDB = async (
 ) => {
   const { limit, page, skip } = calculatePagination(options);
   const { start, end, ...filterData } = filters;
-  console.log(filters);
 
   const andConditions = [];
 
