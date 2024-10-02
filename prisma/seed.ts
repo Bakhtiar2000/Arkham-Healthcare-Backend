@@ -9,7 +9,7 @@ const seedSuperAdmin = async () => {
       },
     });
     if (isSuperAdminExists) {
-      console.log("Super Admin  Already exists");
+      console.log("Super Admin already exists");
       return;
     }
 
@@ -28,7 +28,7 @@ const seedSuperAdmin = async () => {
       },
     });
 
-    console.log("Super Admin crated automatically", superAdminData);
+    console.log("Super Admin created automatically", superAdminData);
   } catch (error) {
     console.log(error);
   } finally {
