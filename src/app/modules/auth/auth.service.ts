@@ -27,6 +27,7 @@ const loginUser = async (payload: { email: string; password: string }) => {
   }
 
   const tokenPayload = {
+    userId: userData.id,
     email: userData.email,
     role: userData.role,
   };
@@ -64,6 +65,7 @@ const refreshToken = async (token: string) => {
     },
   });
   const tokenPayload = {
+    userId: userData.id,
     email: userData.email,
     role: userData.role,
   };
@@ -121,6 +123,7 @@ const forgotPassword = async (payload: { email: string }) => {
   });
 
   const tokenPayload = {
+    userId: userData.id,
     email: userData.email,
     role: userData.role,
   };

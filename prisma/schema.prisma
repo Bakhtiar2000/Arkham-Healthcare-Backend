@@ -8,7 +8,7 @@ datasource db {
 }
 
 model User {
-  id                 String     @id @default(uuid()) // creates unique string id every time
+  id                 String     @id @default(uuid())
   email              String     @unique
   password           String
   role               UserRole
@@ -32,56 +32,53 @@ model Admin {
   isDeleted     Boolean  @default(false)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
-
-  user User @relation(fields: [email], references: [email])
+  user          User     @relation(fields: [email], references: [email])
 
   @@map("admins")
 }
 
 model Doctor {
-  id                  String   @id @default(uuid())
+  id                  String              @id @default(uuid())
   name                String
-  email               String   @unique
+  email               String              @unique
   profilePhoto        String?
   contactNumber       String
   address             String?
   registrationNumber  String
-  experience          Int      @default(0)
+  experience          Int                 @default(0)
   gender              Gender
   appointmentFee      Int
   qualification       String
   currentWorkingPlace String
   designation         String
-  isDeleted           Boolean  @default(false)
-  averageRating       Float    @default(0.0)
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
-
-  user              User                @relation(fields: [email], references: [email])
-  doctorSpecialties DoctorSpecialties[]
-  doctorSchedules   DoctorSchedules[]
-  appointment       Appointment[]
-  prescription      Prescription[]
-  review            Review[]
+  isDeleted           Boolean             @default(false)
+  averageRating       Float               @default(0.0)
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+  appointment         Appointment[]
+  doctorSchedules     DoctorSchedules[]
+  doctorSpecialties   DoctorSpecialties[]
+  user                User                @relation(fields: [email], references: [email])
+  prescription        Prescription[]
+  review              Review[]
 
   @@map("doctors")
 }
 
 model Patient {
-  id            String   @id @unique @default(uuid())
-  email         String   @unique
-  name          String
-  profilePhoto  String?
-  contactNumber String?
-  address       String?
-  isDeleted     Boolean  @default(false)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  user              User               @relation(references: [email], fields: [email])
-  patientHealthData PatientHealthData?
-  medicalReport     MedicalReport[]
+  id                String             @id @unique @default(uuid())
+  email             String             @unique
+  name              String
+  profilePhoto      String?
+  contactNumber     String?
+  address           String?
+  isDeleted         Boolean            @default(false)
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
   appointment       Appointment[]
+  medicalReport     MedicalReport[]
+  patientHealthData PatientHealthData?
+  user              User               @relation(fields: [email], references: [email])
   prescription      Prescription[]
   review            Review[]
 
@@ -98,11 +95,10 @@ model Specialties {
 }
 
 model DoctorSpecialties {
+  doctorId      String
   specialtiesId String
+  doctor        Doctor      @relation(fields: [doctorId], references: [id])
   specialties   Specialties @relation(fields: [specialtiesId], references: [id])
-
-  doctorId String
-  doctor   Doctor @relation(fields: [doctorId], references: [id])
 
   @@id([specialtiesId, doctorId])
   @@map("doctor_specialties")
@@ -111,7 +107,6 @@ model DoctorSpecialties {
 model PatientHealthData {
   id                  String        @id @default(uuid())
   patientId           String        @unique
-  patient             Patient       @relation(fields: [patientId], references: [id])
   gender              Gender
   dateOfBirth         String
   bloodGroup          BloodGroup
@@ -130,6 +125,7 @@ model PatientHealthData {
   maritalStatus       MaritalStatus @default(UNMARRIED)
   createdAt           DateTime      @default(now())
   updatedAt           DateTime      @updatedAt
+  patient             Patient       @relation(fields: [patientId], references: [id])
 
   @@map("patient_health_datas")
 }
@@ -137,11 +133,11 @@ model PatientHealthData {
 model MedicalReport {
   id         String   @id @default(uuid())
   patientId  String
-  patient    Patient  @relation(fields: [patientId], references: [id])
   reportName String
   reportLink String
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+  patient    Patient  @relation(fields: [patientId], references: [id])
 
   @@map("madical_reports")
 }
@@ -152,44 +148,38 @@ model Schedule {
   endDateTime     DateTime
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
-  doctorSchedules DoctorSchedules[]
   appointment     Appointment?
+  doctorSchedules DoctorSchedules[]
 
   @@map("schedules")
 }
 
 model DoctorSchedules {
-  doctorId String
-  doctor   Doctor @relation(fields: [doctorId], references: [id])
-
-  scheduleId String
-  schedule   Schedule @relation(fields: [scheduleId], references: [id])
-
-  isBooked Boolean @default(false)
-
+  doctorId      String
+  scheduleId    String
+  isBooked      Boolean      @default(false)
   appointmentId String?      @unique
   appointment   Appointment? @relation(fields: [appointmentId], references: [id])
+  doctor        Doctor       @relation(fields: [doctorId], references: [id])
+  schedule      Schedule     @relation(fields: [scheduleId], references: [id])
 
   @@id([doctorId, scheduleId])
   @@map("doctor_schedules")
 }
 
 model Appointment {
-  id        String  @id @default(uuid())
-  patientId String
-  patient   Patient @relation(fields: [patientId], references: [id])
-
-  doctorId String
-  doctor   Doctor @relation(fields: [doctorId], references: [id])
-
-  scheduleId String   @unique
-  schedule   Schedule @relation(fields: [scheduleId], references: [id])
-
+  id              String            @id @default(uuid())
+  patientId       String
+  doctorId        String
+  scheduleId      String            @unique
   videoCallingId  String
   status          AppointmentStatus @default(SCHEDULED)
   paymentStatus   PaymentStatus     @default(UNPAID)
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
+  doctor          Doctor            @relation(fields: [doctorId], references: [id])
+  patient         Patient           @relation(fields: [patientId], references: [id])
+  schedule        Schedule          @relation(fields: [scheduleId], references: [id])
   doctorSchedules DoctorSchedules?
   payment         Payment?
   prescription    Prescription?
@@ -199,16 +189,15 @@ model Appointment {
 }
 
 model Payment {
-  id            String      @id @default(uuid())
-  appointmentId String      @unique
-  appointment   Appointment @relation(fields: [appointmentId], references: [id])
-
+  id                 String        @id @default(uuid())
+  appointmentId      String        @unique
   amount             Float
   transactionId      String        @unique
   status             PaymentStatus @default(UNPAID)
   paymentGatewayData Json?
   createdAt          DateTime      @default(now())
   updatedAt          DateTime      @updatedAt
+  appointment        Appointment   @relation(fields: [appointmentId], references: [id])
 
   @@map("payments")
 }
@@ -216,37 +205,31 @@ model Payment {
 model Prescription {
   id            String      @id @default(uuid())
   appointmentId String      @unique
+  doctorId      String
+  patientId     String
+  instructions  String
+  followUpDate  DateTime?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
   appointment   Appointment @relation(fields: [appointmentId], references: [id])
-
-  doctorId String
-  doctor   Doctor @relation(fields: [doctorId], references: [id])
-
-  patientId String
-  patient   Patient @relation(fields: [patientId], references: [id])
-
-  instructions String
-  followUpDate DateTime?
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  doctor        Doctor      @relation(fields: [doctorId], references: [id])
+  patient       Patient     @relation(fields: [patientId], references: [id])
 
   @@map("prescriptions")
 }
 
 model Review {
-  id        String  @id @default(uuid())
-  patientId String
-  patient   Patient @relation(fields: [patientId], references: [id])
-
-  doctorId String
-  doctor   Doctor @relation(fields: [doctorId], references: [id])
-
+  id            String      @id @default(uuid())
+  patientId     String
+  doctorId      String
   appointmentId String      @unique
+  rating        Float
+  comment       String
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
   appointment   Appointment @relation(fields: [appointmentId], references: [id])
-
-  rating    Float
-  comment   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  doctor        Doctor      @relation(fields: [doctorId], references: [id])
+  patient       Patient     @relation(fields: [patientId], references: [id])
 
   @@map("reviews")
 }
