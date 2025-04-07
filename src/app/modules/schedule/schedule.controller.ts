@@ -29,7 +29,8 @@ const getAllSchedules = catchAsync(
       statusCode: httpStatus.OK,
       success: true,
       message: "Schedules are fetched successfully",
-      data: result,
+      data: result.data,
+      meta: result.meta,
     });
   }
 );
